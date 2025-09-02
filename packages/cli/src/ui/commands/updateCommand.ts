@@ -27,19 +27,38 @@ export const updateCommand: SlashCommand = {
     );
 
     try {
-      // Run the sync script
-      execSync('npm run sync-upstream', { 
-        stdio: 'pipe',
-        cwd: process.cwd()
-      });
+      // Check if we're in a linked global installation
+      const isGlobalLink = process.env.npm_config_global || process.argv[0].includes('node_modules/.bin');
+      
+      if (isGlobalLink) {
+        // Update global link
+        execSync('npm run update-global', { 
+          stdio: 'pipe',
+          cwd: process.cwd()
+        });
+        
+        addItem(
+          {
+            type: MessageType.INFO,
+            text: '✅ Global installation updated! Changes are immediately available.',
+          },
+          Date.now(),
+        );
+      } else {
+        // Run the sync script for local development
+        execSync('npm run sync-upstream', { 
+          stdio: 'pipe',
+          cwd: process.cwd()
+        });
 
-      addItem(
-        {
-          type: MessageType.INFO,
-          text: '✅ Updated to latest version! Restart the CLI to use new features.',
-        },
-        Date.now(),
-      );
+        addItem(
+          {
+            type: MessageType.INFO,
+            text: '✅ Updated to latest version! Restart the CLI to use new features.',
+          },
+          Date.now(),
+        );
+      }
 
     } catch (error) {
       const err = error as Error;

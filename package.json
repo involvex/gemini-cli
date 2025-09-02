@@ -52,6 +52,8 @@
     "sync-upstream": "node scripts/sync-upstream.js",
     "setup-fork": "node scripts/setup-fork.js",
     "dashboard": "node packages/dashboard/src/server.js",
+    "global-link": "node scripts/global-link.js",
+    "update-global": "node scripts/global-link.js update",
     "clean": "node scripts/clean.js"
   },
   "bin": {

@@ -53,8 +53,11 @@ const CUSTOM_FILES = [
   'packages/dashboard/',
   'scripts/sync-upstream.js',
   'scripts/setup-fork.js',
+  'scripts/global-link.js',
   'FORK_README.md',
   'GEMINI_CLI_PLUS_README.md',
+  'GLOBAL_INSTALLATION.md',
+  'UPLOAD_INSTRUCTIONS.md',
   'package.json'
 ];
 
