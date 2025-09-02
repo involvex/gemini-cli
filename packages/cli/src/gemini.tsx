@@ -344,6 +344,25 @@ export async function main() {
 
   // Render UI, passing necessary config values. Check that there is no command line question.
   if (config.isInteractive()) {
+    // Auto-launch dashboard
+    try {
+      const { spawn } = await import('node:child_process');
+      const { join, dirname } = await import('node:path');
+      const { fileURLToPath } = await import('node:url');
+      const __dirname = dirname(fileURLToPath(import.meta.url));
+      const dashboardPath = join(__dirname, '../../../dashboard/src/server.js');
+      
+      const child = spawn('node', [dashboardPath], {
+        detached: true,
+        stdio: 'ignore'
+      });
+      child.unref();
+      
+      console.log('🚀 Dashboard auto-started at http://localhost:3333');
+    } catch (error) {
+      // Silently fail dashboard launch
+    }
+    
     await startInteractiveUI(config, settings, startupWarnings, workspaceRoot);
     return;
   }
