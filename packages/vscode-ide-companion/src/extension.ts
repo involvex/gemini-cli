@@ -26,18 +26,45 @@ async function checkForUpdates(
   try {
     const currentVersion = context.extension.packageJSON.version;
 
-    // Fetch package.json from the main branch of the repository.
-    // This is a simple way to get the latest version.
+    // Fetch extension details from the VSCode Marketplace.
     const response = await fetch(
-      'https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/vscode-ide-companion/package.json',
+      'https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json;api-version=7.1-preview.1',
+        },
+        body: JSON.stringify({
+          filters: [
+            {
+              criteria: [
+                {
+                  filterType: 7, // Corresponds to ExtensionName
+                  value: CLI_IDE_COMPANION_IDENTIFIER,
+                },
+              ],
+            },
+          ],
+          // See: https://learn.microsoft.com/en-us/azure/devops/extend/gallery/apis/hyper-linking?view=azure-devops
+          // 946 = IncludeVersions | IncludeFiles | IncludeCategoryAndTags |
+          //       IncludeShortDescription | IncludePublisher | IncludeStatistics
+          flags: 946,
+        }),
+      },
     );
+
     if (!response.ok) {
-      log(`Failed to fetch latest version info: ${response.statusText}`);
+      log(
+        `Failed to fetch latest version info from marketplace: ${response.statusText}`,
+      );
       return;
     }
 
-    const packageJson = await response.json();
-    const latestVersion = packageJson.version;
+    const data = await response.json();
+    const extension = data?.results?.[0]?.extensions?.[0];
+    // The versions are sorted by date, so the first one is the latest.
+    const latestVersion = extension?.versions?.[0]?.version;
 
     if (latestVersion && semver.gt(latestVersion, currentVersion)) {
       const selection = await vscode.window.showInformationMessage(
