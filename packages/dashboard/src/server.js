@@ -186,8 +186,7 @@ app.get('/api/logs', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.send(`
-<!DOCTYPE html>
+  const html = `<!DOCTYPE html>
 <html>
 <head>
     <title>Gemini CLI+ Dashboard</title>
@@ -345,7 +344,7 @@ app.get('/', (req, res) => {
         function addMessage(message) {
             const container = document.getElementById('chatContainer');
             const div = document.createElement('div');
-            div.className = \`message \${message.type}\`;
+            div.className = 'message ' + message.type;
             div.textContent = message.text;
             container.appendChild(div);
             container.scrollTop = container.scrollHeight;
@@ -393,7 +392,7 @@ app.get('/', (req, res) => {
             fetch('/api/logs').then(r => r.json()).then(logs => {
                 const container = document.getElementById('logsContainer');
                 container.innerHTML = logs.map(log => 
-                    \`[\${log.timestamp}] \${log.message}\`
+                    '[' + log.timestamp + '] ' + log.message
                 ).join('\\n');
             });
         }
@@ -408,7 +407,7 @@ app.get('/', (req, res) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ command: cmd })
             }).then(r => r.json()).then(result => {
-                addMessage({ text: `Executed: ${cmd}`, type: 'user', timestamp: new Date().toISOString() });
+                addMessage({ text: 'Executed: ' + cmd, type: 'user', timestamp: new Date().toISOString() });
                 addMessage({ text: result.output, type: 'ai', timestamp: result.timestamp });
             });
         }
@@ -417,14 +416,11 @@ app.get('/', (req, res) => {
             fetch('/api/apikeys').then(r => r.json()).then(data => {
                 const container = document.getElementById('apiKeysList');
                 container.innerHTML = data.keys.map((key, i) => 
-                    `<div class="api-key-item">
-                        <span>${key.key}</span>
-                        <button onclick="removeApiKey(${i})">Remove</button>
-                    </div>`
+                    '<div class="api-key-item"><span>' + key.key + '</span><button onclick="removeApiKey(' + i + ')">Remove</button></div>'
                 ).join('');
                 
                 document.getElementById('apiStats').innerHTML = 
-                    `<strong>Usage Statistics:</strong><br>${JSON.stringify(data.usage, null, 2)}`;
+                    '<strong>Usage Statistics:</strong><br>' + JSON.stringify(data.usage, null, 2);
             });
         }
         
@@ -443,7 +439,7 @@ app.get('/', (req, res) => {
         }
         
         function removeApiKey(index) {
-            fetch(`/api/apikeys/${index}`, { method: 'DELETE' })
+            fetch('/api/apikeys/' + index, { method: 'DELETE' })
                 .then(() => loadApiKeys());
         }
         
@@ -451,13 +447,7 @@ app.get('/', (req, res) => {
             fetch('/api/mcp').then(r => r.json()).then(servers => {
                 const container = document.getElementById('mcpServersList');
                 container.innerHTML = servers.map(server => 
-                    `<div class="mcp-server">
-                        <div>
-                            <span class="status-dot ${server.connected ? 'connected' : 'disconnected'}"></span>
-                            <strong>${server.name}</strong> - ${server.description}
-                        </div>
-                        <div>${server.url}</div>
-                    </div>`
+                    '<div class="mcp-server"><div><span class="status-dot ' + (server.connected ? 'connected' : 'disconnected') + '"></span><strong>' + server.name + '</strong> - ' + server.description + '</div><div>' + server.url + '</div></div>'
                 ).join('');
             });
         }
@@ -485,7 +475,7 @@ app.get('/', (req, res) => {
             fetch('/api/commands').then(r => r.json()).then(commands => {
                 const container = document.getElementById('customCommands');
                 container.innerHTML = commands.map(cmd => 
-                    `<button onclick="executeCommand('/${cmd.name}')" title="${cmd.description}">/${cmd.name}</button>`
+                    '<button onclick="executeCommand(\\'/\\' + cmd.name + \\')\\" title="' + cmd.description + '">/' + cmd.name + '</button>'
                 ).join('');
             });
         }
@@ -519,8 +509,9 @@ app.get('/', (req, res) => {
         });
     </script>
 </body>
-</html>
-  `);
+</html>`;
+  
+  res.send(html);
 });
 
 const server = app.listen(PORT, () => {

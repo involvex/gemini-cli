@@ -4,8 +4,8 @@
   "type": "module",
   "main": "dist/server.js",
   "scripts": {
-    "build": "node ../../scripts/build_package.js",
-    "start": "node dist/server.js",
+    "build": "echo Dashboard uses JS, skipping TypeScript build && if not exist dist mkdir dist && copy src\\server.js dist\\server.js",
+    "start": "node src/server.js",
     "dev": "node src/server.js"
   },
   "dependencies": {

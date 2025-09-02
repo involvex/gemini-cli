@@ -28,7 +28,7 @@ export const updateCommand: SlashCommand = {
 
     try {
       // Check if we're in a linked global installation
-      const isGlobalLink = process.env.npm_config_global || process.argv[0].includes('node_modules/.bin');
+      const isGlobalLink = process.env['npm_config_global'] || process.argv[0].includes('node_modules/.bin');
       
       if (isGlobalLink) {
         // Update global link
